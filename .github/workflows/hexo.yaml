@@ -55,7 +55,7 @@ jobs:
           git clone "https://${{ secrets.GH_REF }}" deploy_git
 
           # 切换到 deploy_git 目录
-          cd ./deploy_git
+          cd deploy_git
 
           # 切换到 main 分支
           git checkout main
@@ -64,9 +64,13 @@ jobs:
           git config --local user.email "your-email@example.com"  # 你的邮箱
           git config --local user.name "your-username"  # 你的用户名
 
+          # 清空 deploy_git 目录并复制生成的文件
+          rm -rf *  # 清空 deploy_git 目录
+          cp -r ../public/* .  # 从上级目录的 public 复制生成的文件到 deploy_git 目录
+
           # 添加更改并提交
           git add .
-          git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
+          git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
 
           # 强制推送到 main 分支
           git push --force "https://${{ secrets.GH_TOKEN }}@${{ secrets.GH_REF }}" main:main
