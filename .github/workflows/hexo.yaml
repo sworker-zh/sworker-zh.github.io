@@ -57,17 +57,6 @@ jobs:
           # 切换到 deploy_git 目录
           cd ./deploy_git
 
-      - name: Init and update submodules
-        run: |
-          git submodule init
-          git submodule update --recursive --remote
-
-          ls -al
-
-          rsync -av --progress blog_source/ ./
-
-          # cp -r blog_source/* ./
-
           # 切换到 main 分支
           git checkout main
 
