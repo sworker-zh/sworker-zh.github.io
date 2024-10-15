@@ -1,44 +1,52 @@
-name: Hexo
+name: GitHub Auto Buider For Blog
 
 on:
   push:
     branches:
-      - master
+      - main
+  schedule:
+    - cron: '0 21 * * *'
 
 env:
   TZ: Asia/Shanghai
 
-jobs:
+jobs:        
   blog-cicd:
     name: Hexo build and deploy
     runs-on: ubuntu-latest
-
+    
     steps:
+      - name: My Step
+        run: echo ${{ secrets.GH_TOKEN }}
+        
       - name: Checkout codes
         uses: actions/checkout@v2
-        with:
-          submodules: 'true'
 
       - name: Setup node
-        uses: actions/setup-node@v1.1.0
+        uses: actions/setup-node@v4
         with:
-          version: "14.x"
+          node-version: "14.x"
+
+      - name: Clone themes
+        run: |
+          git clone -b master https://github.com/fluid-dev/hexo-theme-fluid.git themes/fluid          
 
       - name: Cache Node Dependencies
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v1
         with:
-          path: ~/.npm
+          path: .npm
           key: ${{runner.OS}}-npm-caches-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
         run: |
           npm install hexo-cli -g
           npm install
+          npm audit fix          
 
       - name: Generate files
         run: |
-          hexo generate
+          hexo clean && hexo generate          
 
       - name: Deploy blog
         uses: peaceiris/actions-gh-pages@v3
@@ -49,3 +57,13 @@ jobs:
           publish_dir: ./public
           full_commit_message: GitHub Actions Auto Builder
           disable_nojekyll: true
+        # run: |
+        #   git clone "https://${{ secrets.GH_REF }}" deploy_git
+        #   mv ./deploy_git/.git ./public/
+        #   cd ./public
+        #   git checkout main
+        #   git config --local user.email "pppfz1@outlook.com" # 你的邮箱
+        #   git config --local user.name "pppfz" # 你的用户名
+        #   git add .
+        #   git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
+        #   git push --force "https://${{ secrets.GH_TOKEN }}@${{ secrets.GH_REF }}" main:main          
