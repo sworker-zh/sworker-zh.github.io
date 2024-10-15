@@ -51,9 +51,9 @@ jobs:
 
       - name: Deploy blog
         run: |
+          cd 
           pwd
           git clone "https://${{ secrets.GH_REF }}" deploy_git
-          # git clone "https://github.com/sworker-zh/sworker-zh.github.io.git" deploy_git
           mv ./deploy_git/.git ./public/
           cd ./public
           git checkout main
