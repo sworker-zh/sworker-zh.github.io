@@ -57,7 +57,9 @@ jobs:
           # 切换到 deploy_git 目录
           cd ./deploy_git
 
-          cp -p ./blog_source/* ./
+          ls -al
+
+          # cp -p ./blog_source/* ./
 
           # 切换到 main 分支
           git checkout main
