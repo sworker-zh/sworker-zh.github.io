@@ -46,34 +46,27 @@ jobs:
         run: |
           hexo clean && hexo generate
           ls -la
-          
-      - name: Run server
+
+      - name: Deploy blog
         run: |
-          hexo d
+          pwd  # 打印当前工作目录
 
-      # - name: Deploy blog
-      #   run: |
-      #     pwd  # 打印当前工作目录
+          # 克隆你的 GitHub Pages 仓库到 deploy_git 目录
+          git clone "https://${{ secrets.GH_REF }}" deploy_git
 
-      #     # 克隆你的 GitHub Pages 仓库到 deploy_git 目录
-      #     git clone "https://${{ secrets.GH_REF }}" deploy_git
+          # 切换到 deploy_git 目录
+          cd ./deploy_git
 
-      #     # 切换到 deploy_git 目录
-      #     cd ./deploy_git
+          # 切换到 main 分支
+          git checkout main
 
-      #     # 切换到 main 分支
-      #     git checkout main
+          # 配置 Git 用户信息
+          git config --local user.email "your-email@example.com"  # 你的邮箱
+          git config --local user.name "your-username"  # 你的用户名
 
-      #     hexo s
+          # 添加更改并提交
+          git add .
+          git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
 
-
-          # # 配置 Git 用户信息
-          # git config --local user.email "your-email@example.com"  # 你的邮箱
-          # git config --local user.name "your-username"  # 你的用户名
-
-          # # 添加更改并提交
-          # git add .
-          # git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
-
-          # # 强制推送到 main 分支
-          # git push --force "https://${{ secrets.GH_TOKEN }}@${{ secrets.GH_REF }}" main:main
+          # 强制推送到 main 分支
+          git push --force "https://${{ secrets.GH_TOKEN }}@${{ secrets.GH_REF }}" main:main
