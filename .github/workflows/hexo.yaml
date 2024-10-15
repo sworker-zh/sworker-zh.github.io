@@ -51,14 +51,29 @@ jobs:
 
       - name: Deploy blog
         run: |
-          cd 
+          # 确保当前路径为工作目录
           pwd
+
+          # 克隆你的 GitHub Pages 仓库到 deploy_git 目录
           git clone "https://${{ secrets.GH_REF }}" deploy_git
-          mv ./deploy_git/.git ./public/
-          cd ./public
+
+          # 切换到 deploy_git 目录
+          cd ./deploy_git
+
+          # 切换到 main 分支
           git checkout main
+
+          # 将生成的 public 目录中的文件复制到 deploy_git 中
+          cp -r ../public/* .
+
+          # 配置 Git 用户信息
           git config --local user.email "sworker.zh@hotmail.com" # 你的邮箱
           git config --local user.name "sworker.zh" # 你的用户名
+
+          # 添加更改并提交
           git add .
           git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
-          git push --force "https://${{ secrets.GH_TOKEN }}@${{ secrets.GH_REF }}" main:main       
+
+          # 强制推送到 main 分支
+          git push --force "https://${{ secrets.GH_TOKEN }}@${{ secrets.GH_REF }}" main:main
+      
