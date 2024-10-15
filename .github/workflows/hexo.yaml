@@ -49,18 +49,6 @@ jobs:
         run: |
           hexo clean && hexo generate          
 
-      - name: List files after generation
-        run: |
-          echo "Listing files after Hexo generate:"
-          ls -la
-          echo "Checking if public directory exists:"
-          if [ -d "public" ]; then
-            echo "public directory exists."
-          else
-            echo "public directory does not exist. Exiting."
-            exit 1
-          fi
-
       - name: Deploy blog
         run: |
           # 打印当前工作目录
