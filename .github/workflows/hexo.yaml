@@ -1,4 +1,4 @@
-name: GitHub Auto Buider For Blog
+name: GitHub Auto Builder For Blog
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: My Step
+      - name: Print GH_TOKEN
         run: echo ${{ secrets.GH_TOKEN }}
         
       - name: Checkout codes
@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: .npm
-          key: ${{runner.OS}}-npm-caches-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-npm-caches-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
         run: |
@@ -49,22 +49,49 @@ jobs:
         run: |
           hexo clean && hexo generate          
 
+      - name: List files after generation
+        run: |
+          echo "Listing files after Hexo generate:"
+          ls -la
+          echo "Checking if public directory exists:"
+          if [ -d "public" ]; then
+            echo "public directory exists."
+          else
+            echo "public directory does not exist. Exiting."
+            exit 1
+          fi
+
       - name: Deploy blog
         run: |
-          # 确保当前路径为工作目录
+          # 打印当前工作目录
           pwd
+          ls -la
 
-          # 克隆你的 GitHub Pages 仓库到 deploy_git 目录
+          # 克隆 GitHub Pages 仓库到 deploy_git 目录
           git clone "https://${{ secrets.GH_REF }}" deploy_git
 
           # 切换到 deploy_git 目录
           cd ./deploy_git
 
-          # 切换到 main 分支
+          # 确保切换到 main 分支
           git checkout main
 
-          # 将生成的 public 目录中的文件复制到 deploy_git 中
-          cp -r ../public/* .
+          # 列出 deploy_git 目录中的内容
+          echo "Listing deploy_git directory:"
+          ls -la
+
+          # 返回到仓库根目录
+          cd ..
+
+          # 确认 public 目录内容
+          echo "Listing public directory:"
+          ls -la public
+
+          # 将 public 目录中的文件复制到 deploy_git 中
+          cp -r public/* deploy_git/
+
+          # 切换到 deploy_git 目录
+          cd deploy_git
 
           # 配置 Git 用户信息
           git config --local user.email "sworker.zh@hotmail.com" # 你的邮箱
@@ -76,4 +103,3 @@ jobs:
 
           # 强制推送到 main 分支
           git push --force "https://${{ secrets.GH_TOKEN }}@${{ secrets.GH_REF }}" main:main
-      
