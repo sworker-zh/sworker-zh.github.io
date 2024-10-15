@@ -45,7 +45,7 @@ jobs:
       - name: Generate files
         run: |
           hexo clean && hexo generate
-          ls -la public  # 添加这一步确认 public 目录是否生成
+          ls -la
 
       - name: Deploy blog
         run: |
