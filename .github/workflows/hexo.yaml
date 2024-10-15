@@ -46,6 +46,8 @@ jobs:
         run: |
           hexo clean && hexo generate
           ls -la
+          
+      - name: Run server
           hexo server
 
       # - name: Deploy blog
