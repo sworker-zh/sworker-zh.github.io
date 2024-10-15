@@ -55,7 +55,7 @@ jobs:
           personal_token: ${{ secrets.GH_TOKEN }}
           external_repository: ${{ secrets.GH_REF }}
           publish_branch: master
-          publish_dir: ./public
+          publish_dir: ./
           full_commit_message: GitHub Actions Auto Builder
           disable_nojekyll: true
         # run: |
