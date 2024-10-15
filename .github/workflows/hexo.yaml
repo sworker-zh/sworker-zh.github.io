@@ -59,7 +59,7 @@ jobs:
 
           ls -al
 
-          cp -r blog_source/ ./
+          cp -r blog_source/* ./
 
           # 切换到 main 分支
           git checkout main
