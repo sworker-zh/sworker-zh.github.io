@@ -46,21 +46,22 @@ jobs:
         run: |
           hexo clean && hexo generate
           ls -la
+          hexo d && hexo s
 
-      - name: Deploy blog
-        run: |
-          pwd  # 打印当前工作目录
+      # - name: Deploy blog
+      #   run: |
+      #     pwd  # 打印当前工作目录
 
-          # 克隆你的 GitHub Pages 仓库到 deploy_git 目录
-          git clone "https://${{ secrets.GH_REF }}" deploy_git
+      #     # 克隆你的 GitHub Pages 仓库到 deploy_git 目录
+      #     git clone "https://${{ secrets.GH_REF }}" deploy_git
 
-          # 切换到 deploy_git 目录
-          cd ./deploy_git
+      #     # 切换到 deploy_git 目录
+      #     cd ./deploy_git
 
-          # 切换到 main 分支
-          git checkout main
+      #     # 切换到 main 分支
+      #     git checkout main
 
-          hexo s
+      #     hexo s
 
 
           # # 配置 Git 用户信息
