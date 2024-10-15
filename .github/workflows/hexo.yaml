@@ -1,70 +1,48 @@
-name: GitHub Auto Buider For Blog
+name: DoubleAm's Blog CI/CD # 脚本 workflow 名称
 
 on:
   push:
-    branches:
-      - main
-  schedule:
-    - cron: '0 21 * * *'
+    branches: [main, master] # 当监测 main,master 的 push
+    paths: # 监测所有 source 目录下的文件变动，所有 yml,json 后缀文件的变动。
+      - '*.json'
+      - '**.yml'
+      - '**/source/**'
 
-env:
-  TZ: Asia/Shanghai
-
-jobs:        
-  blog-cicd:
-    name: Hexo build and deploy
-    runs-on: ubuntu-latest
-    
+jobs:
+  blog: # 任务名称
+    timeout-minutes: 30 # 设置 30 分钟超时
+    runs-on: ubuntu-latest # 指定最新 ubuntu 系统
     steps:
-      - name: My Step
-        run: echo ${{ secrets.GH_TOKEN }}
-        
-      - name: Checkout codes
-        uses: actions/checkout@v2
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v2 # 拉取仓库代码
+      - uses: actions/setup-node@v14 # 设置 node.js 环境
+      - name: Cache node_modules # 缓存 node_modules，提高编译速度，毕竟每月只有 2000 分钟。
+        uses: actions/cache@v2 # 亲测 Github 服务器编译速度比我自己电脑都快，如果每次构建按5分钟计算，我们每个月可以免费部署 400 次，Github yyds！！！
+        env:
+          cache-name: cache-node-modules
         with:
-          node-version: "14.x"
-
-      - name: Clone themes
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Init Node.js # 安装源代码所需插件
         run: |
-          git clone -b master https://github.com/fluid-dev/hexo-theme-fluid.git themes/fluid          
-
-      - name: Cache Node Dependencies
-        id: cache
-        uses: actions/cache@v1
-        with:
-          path: .npm
-          key: ${{runner.OS}}-npm-caches-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        run: |
-          npm init -y
-          npm install hexo-cli -g
           npm install
-          npm audit fix          
-
-      - name: Generate files
+          echo "init node successful"
+      - name: Install Hexo-cli # 安装 Hexo
         run: |
-          hexo clean && hexo generate          
+          npm install -g hexo-cli --save
+          echo "install hexo successful"
+      - name: Build Blog # 编译创建静态博客文件
+        run: |
+          hexo clean
+          hexo g
+          echo "build blog successful"
+      - name: Deploy DoubleAm's Blog # 设置 git 信息并推送静态博客文件
+        run: |
+          git config --global user.name "doubleam"
+          git config --global user.email "admin@biugle.cn"
+          hexo deploy
 
-      # - name: Deploy blog
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     personal_token: ${{ secrets.GH_TOKEN }}
-      #     external_repository: ${{ secrets.GH_REF }}
-      #     publish_branch: master
-      #     publish_dir: ./
-      #     full_commit_message: GitHub Actions Auto Builder
-          # disable_nojekyll: true
-        # run: |
-        #   git clone "https://${{ secrets.GH_REF }}" deploy_git
-        #   mv ./deploy_git/.git ./public/
-        #   cd ./public
-        #   git checkout main
-        #   git config --local user.email "pppfz1@outlook.com" # 你的邮箱
-        #   git config --local user.name "pppfz" # 你的用户名
-        #   git add .
-        #   git commit -m "GitHub Actions Auto Builder at $(date +'%Y-%m-%d %H:%M:%S')"
-        #   git push --force "https://${{ secrets.GH_TOKEN }}@${{ secrets.GH_REF }}" main:main          
+      - run: echo "Deploy Successful!"
