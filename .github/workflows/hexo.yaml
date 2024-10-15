@@ -57,7 +57,7 @@ jobs:
       #     publish_branch: master
       #     publish_dir: ./
       #     full_commit_message: GitHub Actions Auto Builder
-          disable_nojekyll: true
+          # disable_nojekyll: true
         # run: |
         #   git clone "https://${{ secrets.GH_REF }}" deploy_git
         #   mv ./deploy_git/.git ./public/
