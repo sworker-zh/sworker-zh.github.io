@@ -48,6 +48,7 @@ jobs:
           ls -la
           
       - name: Run server
+        run: |
           hexo server
 
       # - name: Deploy blog
